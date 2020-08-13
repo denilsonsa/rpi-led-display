@@ -56,6 +56,9 @@ My objective is to have a nice extra display in addition to whatever else that R
     * Memory usage
 * Weather
 * Clock
+    * Local time
+    * Some other timezone
+    * [Swatch Internet Time](https://en.wikipedia.org/wiki/Swatch_Internet_Time) ([online clock](https://github.com/Clidus/swatch))
 * Data from [Home Assistant](https://www.home-assistant.io/)
 * Anything else I can come up with
 

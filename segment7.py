@@ -28,7 +28,7 @@ char_to_bin_map = {
     '’': 0b0000011,  # Close single quote
     '^': 0b0100011,  # This is a bit weird
     '°': 0b1100011,
-    '[': 0b0111001,
+    '[': 0b0111001,  # Ambiguous with 'C'
     ']': 0b0001111,
     '(': 0b0111001,  # Ambiguous with '['
     ')': 0b0001111,  # Ambiguous with ']'
@@ -62,6 +62,7 @@ char_to_bin_map = {
     'q': 0b1100111,
     'r': 0b1010000,
     'S': 0b1101101,  # Ambiguous with '5'
+    #'S': 0b1101100,  # Alternative (and weird)
     't': 0b1111000,
     'u': 0b0011100,
     'V': 0b0111110,  # This looks like 'U'
@@ -69,6 +70,7 @@ char_to_bin_map = {
     'x': 0b0010100,  # This is a weird char
     'y': 0b1101110,
     'Z': 0b1011011,  # Ambiguous with '2'
+    #'Z': 0b0011011,  # Alternative (and weird)
 }
 
 def char_to_bin(char):
