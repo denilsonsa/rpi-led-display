@@ -31,7 +31,7 @@ def main():
                 for i in range(3):
                     # now = datetime.datetime.now().isoformat(' ', 'seconds')
                     now = datetime.datetime.now().time().isoformat('seconds')
-                    print(now)
+                    # print(now)
                     display.write_text(now)
                     sleep(1)
                 for interface in netifaces.interfaces():
@@ -42,7 +42,7 @@ def main():
                     for cfg in ipv4_data:
                         ip = cfg.get('addr', '')
                         text = ip_format(ip, interface)
-                        print(text)
+                        # print(text)
                         display.write_text(text)
                         sleep(8)
         except KeyboardInterrupt:
