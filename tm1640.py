@@ -193,7 +193,7 @@ class TM1640:
         payload = [0] * 16
         i = 0
         for c in text:
-            if i > len(payload):
+            if i >= len(payload):
                 warnings.warn('Text is longer than the display.')
                 break
             if c == '.':
