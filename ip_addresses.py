@@ -18,6 +18,25 @@ def ip_format(ip, iface):
     return ip + padding + iface
 
 
+def slurp(filename):
+    with open(filename) as f:
+        return f.read()
+
+
+# Returns Celsius.
+def read_cpu_temperature():
+    # Raw data is in milliCelsius.
+    return float(slurp('/sys/class/thermal/thermal_zone0/temp')) / 1000;
+
+
+# Returns MHz.
+def read_cpu_freq():
+    # This Raspberry Pi 4 has cpu0 to cpu4.
+    # I believe all of them follow the same clock, so I'm just reading one.
+    # Raw data is in kHz.
+    return int(slurp('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq')) / 1000;
+
+
 def raiseKeyboardInterrupt(signum, frame):
     raise KeyboardInterrupt()
 
@@ -27,8 +46,10 @@ def main():
     with TM1640(clk_pin=24, din_pin=23) as display:
         try:
             display.brightness = 1
+            display.write_text('{:^16}'.format('-- HELLO --'))
+            sleep(1)
             while True:
-                for i in range(5):
+                for i in range(10):
                     # now = datetime.datetime.now().isoformat(' ', 'seconds')
                     # now = datetime.datetime.now().time().isoformat('seconds')
                     now = datetime.datetime.now().strftime('%H:%M:%S  %a %d')
@@ -45,9 +66,17 @@ def main():
                         text = ip_format(ip, interface)
                         # print(text)
                         display.write_text(text)
-                        sleep(5)
+                        sleep(4)
+                if True:
+                    text = " {:2.0f}°C   {:4.0f}MHz".format(
+                        read_cpu_temperature(),
+                        read_cpu_freq(),
+                    )
+                    # print(text)
+                    display.write_text(text)
+                    sleep(4)
         except KeyboardInterrupt:
-            display.write_text('GOODBYE')
+            display.write_text('GOODBYE...')
             display.brightness = 1
             sleep(1)
             display.write_text('')
