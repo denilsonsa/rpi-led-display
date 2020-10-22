@@ -197,8 +197,11 @@ class TM1640:
                 warnings.warn('Text is longer than the display.')
                 break
             if c == '.':
-                if i > 0:
-                    payload[i - 1] |= 0b_1000_0000
+                # Special handling for the dot.
+                # It turns on the dot on the previous character, if it exists and is still off.
+                if i == 0 or (payload[i - 1] & 0b_1000_0000):
+                    i += 1
+                payload[i - 1] |= 0b_1000_0000
             else:
                 b = segment7.char_to_bin(c)
                 payload[i] = b
