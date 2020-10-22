@@ -91,6 +91,8 @@ char_to_bin_map = {
     '⊔': 0b1100010,
     '⋂': 0b0110111,
     '⋃': 0b0111110,  # This looks like 'U' and 'V'
+    'Π': 0b0110111,
+    'μ': 0b1110010,
     '?': 0b1010011,  # This is a bit weird
     '@': 0b0111011,
     #'@': 0b0011111,  # Alternative
