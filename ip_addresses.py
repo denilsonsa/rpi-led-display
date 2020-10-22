@@ -28,9 +28,10 @@ def main():
         try:
             display.brightness = 1
             while True:
-                for i in range(3):
+                for i in range(5):
                     # now = datetime.datetime.now().isoformat(' ', 'seconds')
-                    now = datetime.datetime.now().time().isoformat('seconds')
+                    # now = datetime.datetime.now().time().isoformat('seconds')
+                    now = datetime.datetime.now().strftime('%H:%M:%S  %a %d')
                     # print(now)
                     display.write_text(now)
                     sleep(1)
@@ -44,7 +45,7 @@ def main():
                         text = ip_format(ip, interface)
                         # print(text)
                         display.write_text(text)
-                        sleep(8)
+                        sleep(5)
         except KeyboardInterrupt:
             display.write_text('GOODBYE')
             display.brightness = 1
