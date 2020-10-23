@@ -41,6 +41,41 @@ def raiseKeyboardInterrupt(signum, frame):
     raise KeyboardInterrupt()
 
 
+def display_clock(display):
+    # The length of this string must be a divisor of 60.
+    dashes = "_-‾-"
+    now = datetime.datetime.now()
+    # text = now.isoformat(' ', 'seconds')
+    # text = now.time().isoformat('seconds')
+    text = now.strftime('%H:%M:%S  %a %d')
+    text = text.replace(':', dashes[now.second % len(dashes)])
+    # print(text)
+    display.write_text(text)
+
+
+def display_interfaces(display, delay):
+    for interface in netifaces.interfaces():
+        if interface == 'lo':
+            # Skip the loopback interface.
+            continue
+        ipv4_data = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
+        for cfg in ipv4_data:
+            ip = cfg.get('addr', '')
+            text = ip_format(ip, interface)
+            # print(text)
+            display.write_text(text)
+            sleep(delay)
+
+
+def display_cpu_stats(display):
+    text = " {:2.0f}°C   {:4.0f}MHz".format(
+        read_cpu_temperature(),
+        read_cpu_freq(),
+    )
+    # print(text)
+    display.write_text(text)
+
+
 def main():
     signal.signal(signal.SIGTERM, raiseKeyboardInterrupt)
     with TM1640(clk_pin=24, din_pin=23) as display:
@@ -50,31 +85,11 @@ def main():
             sleep(1)
             while True:
                 for i in range(10):
-                    # now = datetime.datetime.now().isoformat(' ', 'seconds')
-                    # now = datetime.datetime.now().time().isoformat('seconds')
-                    now = datetime.datetime.now().strftime('%H:%M:%S  %a %d')
-                    # print(now)
-                    display.write_text(now)
+                    display_clock(display)
                     sleep(1)
-                for interface in netifaces.interfaces():
-                    if interface == 'lo':
-                        # Skip the loopback interface.
-                        continue
-                    ipv4_data = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
-                    for cfg in ipv4_data:
-                        ip = cfg.get('addr', '')
-                        text = ip_format(ip, interface)
-                        # print(text)
-                        display.write_text(text)
-                        sleep(4)
-                if True:
-                    text = " {:2.0f}°C   {:4.0f}MHz".format(
-                        read_cpu_temperature(),
-                        read_cpu_freq(),
-                    )
-                    # print(text)
-                    display.write_text(text)
-                    sleep(4)
+                display_interfaces(display, 4)
+                display_cpu_stats(display)
+                sleep(4)
         except KeyboardInterrupt:
             display.write_text('GOODBYE...')
             display.brightness = 1
