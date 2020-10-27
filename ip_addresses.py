@@ -41,7 +41,7 @@ def raiseKeyboardInterrupt(signum, frame):
     raise KeyboardInterrupt()
 
 
-def display_clock(display):
+def display_clock():
     # The length of this string must be a divisor of 60.
     dashes = "_-‾-"
     now = datetime.datetime.now()
@@ -49,11 +49,10 @@ def display_clock(display):
     # text = now.time().isoformat('seconds')
     text = now.strftime('%H:%M:%S  %a %d')
     text = text.replace(':', dashes[now.second % len(dashes)])
-    # print(text)
-    display.write_text(text)
+    yield text
 
 
-def display_interfaces(display, delay):
+def display_interfaces():
     for interface in netifaces.interfaces():
         if interface == 'lo':
             # Skip the loopback interface.
@@ -62,34 +61,42 @@ def display_interfaces(display, delay):
         for cfg in ipv4_data:
             ip = cfg.get('addr', '')
             text = ip_format(ip, interface)
-            # print(text)
-            display.write_text(text)
-            sleep(delay)
+            yield text
 
 
-def display_cpu_stats(display):
+def display_cpu_stats():
     text = " {:2.0f}°C   {:4.0f}MHz".format(
         read_cpu_temperature(),
         read_cpu_freq(),
     )
-    # print(text)
-    display.write_text(text)
+    yield text
 
 
 def main():
     signal.signal(signal.SIGTERM, raiseKeyboardInterrupt)
+
+    views = [
+        *[(display_clock, 1)] * 10,
+        (display_interfaces, 4),
+        (display_cpu_stats, 2),
+    ]
+
     with TM1640(clk_pin=24, din_pin=23) as display:
         try:
             display.brightness = 1
             display.write_text('{:^16}'.format('-- HELLO --'))
             sleep(1)
             while True:
-                for i in range(10):
-                    display_clock(display)
-                    sleep(1)
-                display_interfaces(display, 4)
-                display_cpu_stats(display)
-                sleep(4)
+                for (callback, delay) in views:
+                    for text in callback():
+                        # print(repr(text))
+                        if isinstance(text, bytes):
+                            display.write_bytes(text)
+                        elif isinstance(text, str):
+                            display.write_text(text)
+                        else:
+                            raise TypeError('Expected str or bytes, received {!r}'.format(text))
+                        sleep(delay)
         except KeyboardInterrupt:
             display.write_text('GOODBYE...')
             display.brightness = 1
