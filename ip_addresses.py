@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-import datetime
 import netifaces
 import signal
+from datetime import date, datetime, timedelta
+from dateutil.relativedelta import relativedelta
+from dateutil.tz import gettz
+from functools import partial
 from time import sleep
 from tm1640 import TM1640
 
@@ -44,12 +47,57 @@ def raiseKeyboardInterrupt(signum, frame):
 def display_clock():
     # The length of this string must be a divisor of 60.
     dashes = "_-‾-"
-    now = datetime.datetime.now()
+    now = datetime.now()
     # text = now.isoformat(' ', 'seconds')
     # text = now.time().isoformat('seconds')
     text = now.strftime('%H:%M:%S  %a %d')
     text = text.replace(':', dashes[now.second % len(dashes)])
     yield text
+
+
+def display_relative_time(reference, prefix='', suffix='', now=None):
+    '''Given a reference time, displays how long since/until that time.
+
+    This relative time is calculated by counting seconds. During DST changes,
+    this will give different results than naively looking at a clock.
+
+    Here: 1 week = 7 days; 1 day = 24 hours.
+    '''
+
+    if now is None:
+        now = datetime.now(gettz())
+
+    # timedelta cannot be used here, as it will not consider DST changes.
+    secs = int(abs(now.timestamp() - reference.timestamp()))
+    mins = secs // 60
+    hours = mins // 60
+    days = hours // 24
+    weeks = days // 7
+
+    secs = secs % 60
+    mins = mins % 60
+    hours = hours % 24
+    days = days % 7
+
+    if weeks > 0 and days > 0:
+        out = '{}w {}d'.format(weeks, days)
+    elif weeks > 0:
+        out = '{} week{}'.format(weeks, '' if weeks == 1 else 's')
+    elif days > 0:
+        out = "{}d {:02d}h{:02d}'".format(days, hours, mins)
+    else:
+        out = "{:02d}h{:02d}'{:02d}\"".format(hours, mins, secs)
+
+    yield prefix + out + suffix
+
+
+def display_calendar_age(reference, prefix='', suffix='', now=None):
+    if now is None:
+        now = datetime.now(gettz())
+
+    delta = abs(relativedelta(reference, now))
+    out = '{}y {}m'.format(delta.years, delta.months)
+    yield prefix + out + suffix
 
 
 def display_interfaces():
@@ -65,7 +113,7 @@ def display_interfaces():
 
 
 def display_cpu_stats():
-    text = " {:2.0f}°C   {:4.0f}MHz".format(
+    text = ' {:2.0f}°C   {:4.0f}MHz'.format(
         read_cpu_temperature(),
         read_cpu_freq(),
     )
@@ -75,8 +123,14 @@ def display_cpu_stats():
 def main():
     signal.signal(signal.SIGTERM, raiseKeyboardInterrupt)
 
+    TZ_AMS = gettz('Europe/Amsterdam')
+    birth = datetime(2020, 9, 3, 14, 40, tzinfo=TZ_AMS)
+
     views = [
-        *[(display_clock, 1)] * 10,
+        *[(display_clock, 1)] * 5,
+        (partial(display_calendar_age, birth, 'baby '), 3),
+        (partial(display_relative_time, birth, 'baby '), 3),
+        *[(display_clock, 1)] * 5,
         (display_interfaces, 4),
         (display_cpu_stats, 2),
     ]
