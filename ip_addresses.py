@@ -96,7 +96,7 @@ def display_calendar_age(reference, prefix='', suffix='', now=None):
         now = datetime.now(gettz())
 
     delta = abs(relativedelta(reference, now))
-    out = '{}y {}m'.format(delta.years, delta.months)
+    out = '{}y {}m {}d'.format(delta.years, delta.months, delta.days)
     yield prefix + out + suffix
 
 
