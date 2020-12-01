@@ -130,7 +130,7 @@ char_to_bin_map = {
     'U': 0b0111110,
     #'V': 0b0111110,  # This looks like 'U'
     'V': 0b0101010,  # This is a weird char
-    'W': 0b0011101,  # This is a weird char
+    'W': 0b0101010,  # This is a weird char
     #'W': 0b1101010,  # This is a weird char
     'x': 0b1001001,  # This is a weird char, looks like Greek Xi
     #'x': 0b0010100,  # This is a weird char
