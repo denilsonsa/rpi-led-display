@@ -2,6 +2,7 @@
 
 import netifaces
 import signal
+from os import getloadavg
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
@@ -118,6 +119,11 @@ def display_cpu_stats():
         read_cpu_freq(),
     )
     yield text
+    # TODO: Display only 3 digits for loadavg. I mean:
+    # 0.00  to  9.99  or  10.0  to  99.9
+    # Not sure if I need a custom formatting function. Have to investigate.
+    text = 'load {:.2f} {:.2f} {:.2f}'.format(*getloadavg())
+    yield text
 
 
 def main():
@@ -127,12 +133,13 @@ def main():
     birth = datetime(2020, 9, 3, 14, 40, tzinfo=TZ_AMS)
 
     views = [
-        *[(display_clock, 1)] * 5,
+        *[(display_clock, 1)] * 4,
         (partial(display_calendar_age, birth, 'baby '), 3),
         (partial(display_relative_time, birth, 'baby '), 3),
-        *[(display_clock, 1)] * 5,
+        *[(display_clock, 1)] * 4,
         (display_interfaces, 4),
-        (display_cpu_stats, 2),
+        *[(display_clock, 1)] * 4,
+        (display_cpu_stats, 3),
     ]
 
     with TM1640(clk_pin=24, din_pin=23) as display:
