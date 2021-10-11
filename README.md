@@ -66,7 +66,7 @@ My objective is to have a nice extra display in addition to whatever else that R
     * [x] Memory usage
 * Clock and date
     * [x] Local time
-    * [ ] Some other timezone
+    * [x] In another timezone (world clock)
     * [ ] [Swatch Internet Time](https://en.wikipedia.org/wiki/Swatch_Internet_Time) (but nobody uses it anyway)
     * [x] Age of (or countdown to) a certain moment
 * [ ] Data from [Home Assistant](https://www.home-assistant.io/)

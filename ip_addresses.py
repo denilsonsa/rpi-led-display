@@ -59,6 +59,16 @@ def display_clock():
     yield text
 
 
+def display_clock_timezone(tz, prefix='', suffix=''):
+    # The length of this string must be a divisor of 60.
+    dashes = "_-‾-"
+    now = datetime.now(tz)
+    time = now.strftime('%H:%M:%S')
+    time = time.replace(':', dashes[now.second % len(dashes)])
+    text = prefix + time + suffix
+    yield text
+
+
 def display_relative_time(reference, prefix='', suffix='', now=None):
     '''Given a reference time, displays how long since/until that time.
 
@@ -149,12 +159,14 @@ def main():
     signal.signal(signal.SIGTERM, raiseKeyboardInterrupt)
 
     TZ_AMS = gettz('Europe/Amsterdam')
+    TZ_BRA = gettz('America/Sao_Paulo')
     birth = datetime(2020, 9, 3, 14, 40, tzinfo=TZ_AMS)
 
     views = [
         *[(display_clock, 1)] * 4,
         (partial(display_calendar_age, birth, 'baby '), 3),
         (partial(display_relative_time, birth, 'baby '), 3),
+        *[(partial(display_clock_timezone, TZ_BRA, prefix='Brazil '), 1)] * 4,
         *[(display_clock, 1)] * 4,
         (display_interfaces, 4),
         *[(display_clock, 1)] * 4,
