@@ -1,5 +1,4 @@
 dateutil
 gpiozero>=1.5.1
-netifaces
 psutil
 rpi.gpio

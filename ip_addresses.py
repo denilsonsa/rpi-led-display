@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-import netifaces
 import psutil
 import signal
-from os import getloadavg
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from functools import partial
+from os import getloadavg
+from socket import AF_INET
 from time import sleep
 from tm1640 import TM1640
 
@@ -105,15 +105,22 @@ def display_calendar_age(reference, prefix='', suffix='', now=None):
 
 
 def display_interfaces():
-    for interface in netifaces.interfaces():
+    for interface, addresses in sorted(psutil.net_if_addrs().items()):
         if interface == 'lo':
             # Skip the loopback interface.
             continue
-        ipv4_data = netifaces.ifaddresses(interface).get(netifaces.AF_INET, [])
-        for cfg in ipv4_data:
-            ip = cfg.get('addr', '')
-            text = ip_format(ip, interface)
-            yield text
+        if interface.startswith('docker'):
+            # Skip the docker internal network.
+            continue
+        for addr in addresses:
+            # socket.AF_INET for IPv4
+            # socket.AF_INET6 for IPv6
+            # psutil.AF_LINK for hardware MAC address
+
+            # Only show IPv4 addresses, ignore everything else.
+            if addr.family == AF_INET:
+                text = ip_format(addr.address, interface)
+                yield text
 
 
 def display_cpu_stats():
