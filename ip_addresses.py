@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import netifaces
+import psutil
 import signal
 from os import getloadavg
 from datetime import date, datetime, timedelta
@@ -39,6 +40,8 @@ def read_cpu_freq():
     # I believe all of them follow the same clock, so I'm just reading one.
     # Raw data is in kHz.
     return int(slurp('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq')) / 1000;
+    # There is psutil.cpu_freq() as well, but that function is longer and heavier.
+    # https://github.com/giampaolo/psutil/blob/release-5.8.0/psutil/_pslinux.py#L722
 
 
 def raiseKeyboardInterrupt(signum, frame):
@@ -126,6 +129,15 @@ def display_cpu_stats():
     yield text
 
 
+def display_mem_stats():
+    # Only showing RAM stats because this system doesn't have any SWAP configured.
+    ram = psutil.virtual_memory()
+    # ram.percent is the used percentage; but it's hard to show '%' on 7-segment display.
+    # Well, '%' can be shown as '°o', but it's confusing anyway.
+    text = 'RAM {:.0f}G  {:3.1f}G free'.format(ram.total / 1024**3 , ram.available / 1024**3 )
+    yield text
+
+
 def main():
     signal.signal(signal.SIGTERM, raiseKeyboardInterrupt)
 
@@ -140,6 +152,7 @@ def main():
         (display_interfaces, 4),
         *[(display_clock, 1)] * 4,
         (display_cpu_stats, 3),
+        (display_mem_stats, 3),
     ]
 
     with TM1640(clk_pin=24, din_pin=23) as display:
