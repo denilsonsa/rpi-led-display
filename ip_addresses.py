@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import psutil
+import re
 import signal
 from datetime import date, datetime, timedelta
 from dateutil.relativedelta import relativedelta
@@ -119,7 +120,7 @@ def display_interfaces():
         if interface == 'lo':
             # Skip the loopback interface.
             continue
-        if interface.startswith('docker'):
+        if re.match(r'^(docker|veth|br-).+', interface):
             # Skip the docker internal network.
             continue
         for addr in addresses:
