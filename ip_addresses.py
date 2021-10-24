@@ -43,6 +43,12 @@ def read_cpu_freq():
     return int(slurp('/sys/devices/system/cpu/cpu0/cpufreq/scaling_cur_freq')) / 1000;
     # There is psutil.cpu_freq() as well, but that function is longer and heavier.
     # https://github.com/giampaolo/psutil/blob/release-5.8.0/psutil/_pslinux.py#L722
+    #
+    # There is also: vcgencmd measure_clock arm
+    # This should measure the actual CPU speed (even when being throttled);
+    # while the scaling_cur_freq measures the requested CPU speed (i.e. the
+    # frequency requested by the kernel).
+    # https://magpi.raspberrypi.com/articles/how-to-overclock-raspberry-pi-4
 
 
 def raiseKeyboardInterrupt(signum, frame):
