@@ -3,7 +3,8 @@
 import psutil
 import re
 import signal
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, time, timedelta
+from dateutil.easter import easter
 from dateutil.relativedelta import relativedelta
 from dateutil.tz import gettz
 from functools import partial
@@ -85,6 +86,10 @@ def display_relative_time(reference, prefix='', suffix='', now=None):
     Here: 1 week = 7 days; 1 day = 24 hours.
     '''
 
+    # Do nothing if there is no reference time.
+    if reference is None:
+        return
+
     if now is None:
         now = datetime.now(gettz())
 
@@ -113,6 +118,10 @@ def display_relative_time(reference, prefix='', suffix='', now=None):
 
 
 def display_calendar_age(reference, prefix='', suffix='', now=None):
+    # Do nothing if there is no reference time.
+    if reference is None:
+        return
+
     if now is None:
         now = datetime.now(gettz())
 
@@ -167,12 +176,72 @@ def main():
 
     TZ_AMS = gettz('Europe/Amsterdam')
     TZ_BRA = gettz('America/Sao_Paulo')
+    day = timedelta(days=1)
+    # Quick way to convert a plain date to a datetime (at midnight).
+    d_to_dt = lambda d: datetime.combine(d, time.min, tzinfo=TZ_AMS)
+
     birth = datetime(2020, 9, 3, 14, 40, tzinfo=TZ_AMS)
+
+    future_events_carousel = sorted([
+        (datetime(2022,  8,  2, 14, 25, tzinfo=TZ_AMS), 'Welkom    '), # Arrival
+        (datetime(2022,  9, 22, 12, 45, tzinfo=TZ_AMS), 'Tot ziens '), # Departure
+
+        (datetime(2022,  3, 27,  2, 00, tzinfo=TZ_AMS), 'CET-CEST  '), # DST, Daylight Saving Time
+        (datetime(2022, 10, 30,  3, 00, tzinfo=TZ_AMS), 'CEST-CET  '), # DST, Daylight Saving Time
+        (datetime(2023,  3, 26,  2, 00, tzinfo=TZ_AMS), 'CET-CEST  '), # DST, Daylight Saving Time
+        (datetime(2023, 10, 29,  3, 00, tzinfo=TZ_AMS), 'CEST-CET  '), # DST, Daylight Saving Time
+        (datetime(2024,  3, 31,  2, 00, tzinfo=TZ_AMS), 'CET-CEST  '), # DST, Daylight Saving Time
+        (datetime(2024, 10, 27,  3, 00, tzinfo=TZ_AMS), 'CEST-CET  '), # DST, Daylight Saving Time
+    ])
+    future_holidays_carousel = sorted([
+        # I'm assuming this script will be restarted at least once per year.
+        (d_to_dt(easter(date.today().year    ) +  1 * day), 'Easter    '), # Easter Monday, Tweede Paasdag
+        (d_to_dt(easter(date.today().year + 1) +  1 * day), 'Easter    '), # Easter Monday, Tweede Paasdag
+
+        (d_to_dt(easter(date.today().year    ) + 39 * day), 'Ascension '), # Ascension, Hemelvaartsdag
+        (d_to_dt(easter(date.today().year + 1) + 39 * day), 'Ascension '), # Ascension, Hemelvaartsdag
+
+        (d_to_dt(easter(date.today().year    ) + 50 * day), 'Whit Mon  '), # Whit Monday, Tweede Pinksterdag
+        (d_to_dt(easter(date.today().year + 1) + 50 * day), 'Whit Mon  '), # Whit Monday, Tweede Pinksterdag
+
+        (d_to_dt(date(date.today().year    ,  4, 27)), 'Koning    '), # Koningsdag
+        (d_to_dt(date(date.today().year + 1,  4, 27)), 'Koning    '), # Koningsdag
+
+        (d_to_dt(date(date.today().year    , 12, 26)), 'Kerstdag  '), # Xmas, Tweede Kerstdag
+        (d_to_dt(date(date.today().year + 1, 12, 26)), 'Kerstdag  '), # Xmas, Tweede Kerstdag
+    ])
+    # TODO: maybe display other birthdays
 
     views = [
         *[(display_clock, 1)] * 4,
         (partial(display_calendar_age, birth, 'baby '), 3),
         (partial(display_relative_time, birth, 'baby '), 3),
+
+        (lambda: display_relative_time(
+            # Picking up the first element...
+            *next(
+                # From a generator...
+                (item for item in
+                    # That tests these items...
+                    future_events_carousel
+                    # Against a predicate.
+                    if item[0] > datetime.now(TZ_AMS)
+                )
+            )
+        ), 3),
+        (lambda: display_relative_time(
+            # Picking up the first element...
+            *next(
+                # From a generator...
+                (item for item in
+                    # That tests these items...
+                    future_holidays_carousel
+                    # Against a predicate.
+                    if item[0] > datetime.now(TZ_AMS)
+                )
+            )
+        ), 3),
+
         *[(partial(display_clock_timezone, TZ_BRA, prefix='Brazil '), 1)] * 4,
         *[(display_clock, 1)] * 4,
         (display_interfaces, 4),

@@ -70,6 +70,7 @@ My objective is to have a nice extra display in addition to whatever else that R
     * [ ] [Swatch Internet Time](https://en.wikipedia.org/wiki/Swatch_Internet_Time) (but nobody uses it anyway)
     * [x] Age of (or countdown to) a certain moment
     * [ ] Easter date and other moving dates (e.g. Carnival), [dateutil.easter](https://dateutil.readthedocs.io/en/stable/easter.html) can be helpful
+    * [ ] DST changes (find out the date for the next DST change based on tzinfo)
 * [ ] Data from [Home Assistant](https://www.home-assistant.io/)
     * But which data is relevant?
     * And how to fetch data from Home Assistant? Or should Home Assistant push the data to this display?
