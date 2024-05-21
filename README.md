@@ -83,7 +83,9 @@ As for the implementation, I envision a daemon that would communicate with the d
 
 ## Project status
 
-I've written this README before starting the project. It serves as a guide on what I want to achieve. So far… I've connected the display wires to the Raspberry Pi, and I've set up a script to run on boot to display information on the display. So, yes, the project is working and running flawlessly for months. But everything is hard-coded and cannot be modified without editing the code and restarting the script.
+I've configured it to run automatically on boot on my Raspberry Pi, and it has been running flawlessly for years.
+
+But everything is hard-coded and cannot be modified without editing the code and restarting the script. So… it's a hacky project, but it works and it provides useful information to anyone around the display.
 
 ## Known issues
 
@@ -98,3 +100,9 @@ See [gpiozero FAQ](https://gpiozero.readthedocs.io/en/stable/faq.html#why-do-i-g
 ### Installing `rpi.gpio` fails
 
 Please see [this forum post](https://www.raspberrypi.org/forums/viewtopic.php?p=1665230#p1665230) and [this ticket](https://sourceforge.net/p/raspberry-gpio-python/tickets/187/). In summary, upstream `rpi.gpio` fails to compile on GCC version 10 due to `-fno-common` now being the default.
+
+### WTF is the main script called `ip_addresses.py`?
+
+The initial version of this code only displayed the IP address of the machine, and nothing else. It was a great diagnostic tool, as I could connect the Raspberry Pi to a wired network (using an Ethernet cable) and view the assigned IP address without having to connect a large monitor over HDMI.
+
+Over time, the script evolved to display a clock, some countdowns, and some stats; but it was never renamed.
