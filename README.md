@@ -2,7 +2,7 @@
 
 This is the source-code for my custom LED display using a Raspberry Pi.
 
-TODO: Add some photos.
+![Short animated GIF showing the display running](demo.gif)
 
 ## Getting started
 
@@ -69,10 +69,10 @@ My objective is to have a nice extra display in addition to whatever else that R
     * [x] In another timezone (world clock)
     * [ ] [Swatch Internet Time](https://en.wikipedia.org/wiki/Swatch_Internet_Time) (but nobody uses it anyway)
     * [x] Age of (or countdown to) a certain moment
-    * [ ] Easter date and other moving dates (e.g. Carnival), [dateutil.easter](https://dateutil.readthedocs.io/en/stable/easter.html) can be helpful
+    * [x] Easter date and other moving dates (e.g. Carnival), [dateutil.easter](https://dateutil.readthedocs.io/en/stable/easter.html) can be helpful
     * [ ] DST changes (find out the date for the next DST change based on tzinfo)
 * [ ] Data from [Home Assistant](https://www.home-assistant.io/)
-    * But which data is relevant?
+    * But which pieces of data are relevant?
     * And how to fetch data from Home Assistant? Or should Home Assistant push the data to this display?
 * [ ] Weather
     * But from which service? There are many!
